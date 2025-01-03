@@ -15,7 +15,15 @@ type application struct {
 }
 
 type config struct {
-	address string
+	addr string
+	db   dbConfig
+}
+
+type dbConfig struct {
+	addr         string
+	maxOpenConns int
+	maxIdleConns int
+	maxIdleTime  string
 }
 
 func (app *application) mount() *chi.Mux {
@@ -37,14 +45,14 @@ func (app *application) mount() *chi.Mux {
 
 func (app *application) run(mux http.Handler) error {
 	srv := &http.Server{
-		Addr:         app.config.address,
+		Addr:         app.config.addr,
 		Handler:      mux,
 		WriteTimeout: time.Second * 30,
 		ReadTimeout:  time.Second * 10,
 		IdleTimeout:  time.Minute,
 	}
 
-	log.Printf("Starting server on %s", app.config.address)
+	log.Printf("Starting server on %s", app.config.addr)
 
 	return srv.ListenAndServe()
 }
